@@ -16,22 +16,21 @@ async function addNote(title) {
     await saveNotes(notes)
     console.log(chalk.bgGreen('Note was added!'))
 }
-async function removeNote(id){
-    const notes = await getNotes()
-    console.log("ID:",id);
-    console.log(notes);
-    const nn = notes.filter((n)=>n.id !==id )
-    await saveNotes(nn)
-    console.log(chalk.bgRed('The node was deleted!'))
+async function editNote(id, title) {
+    const notes= await getNotes()
+    const note=notes.find(note => note.id === id)
+    note.title=title;
+    await saveNotes(notes)
+    console.log(chalk.bgGreen('Note was edited!'))
 }
-
-
 async function getNotes() {
     const notes = await fs.readFile(notesPath, {encoding: 'utf-8'})
     return Array.isArray(JSON.parse(notes)) ? JSON.parse(notes) : []
 }
 
-async function saveNotes(notes) {
+
+
+async function saveNotes(notes){
     await fs.writeFile(notesPath, JSON.stringify(notes))
 }
 
@@ -44,6 +43,16 @@ async function printNotes() {
     })
 }
 
-module.exports = {
-    addNote, printNotes, removeNote
+async function removeNote(id) {
+    const notes = await getNotes()
+
+    const filtered = notes.filter(note => note.id !== id)
+
+    await saveNotes(filtered)
+    console.log(chalk.red(`Note with id="${id}" has been removed.`))
 }
+
+module.exports = {
+    addNote, getNotes, removeNote, editNote
+}
+
